@@ -5,7 +5,7 @@ for a given background color (specified as three R,G, B values).
 Test with the interactive shell at the end, where black (0,0,0) should prescribe a LIGHT font
 and white (255,255,255) should prescribe a dark font.
 """
-
+# Alex solution 
 import random
 
 import math
@@ -16,9 +16,9 @@ from numpy import log, exp
 
 class LabeledColor:
     def __init__(self, red, green, blue, dark_font_ind):
-        self.red = (red / 255.0)
-        self.green = (green / 255.0)
-        self.blue = (blue / 255.0)
+        self.red = (red/255.0)
+        self.green = (green/255.0)
+        self.blue = (blue/255.0)
         self.dark_font_ind = dark_font_ind
 
     def __str__(self):
@@ -37,8 +37,7 @@ b1 = 1.0  # red beta
 b2 = 1.0  # green beta
 b3 = 1.0  # blue beta
 
-iterations = ?
-
+iterations = 1000 #some random large number of iterations 
 
 # calculate maximum likelihood
 
@@ -46,15 +45,13 @@ iterations = ?
 def predict_probability(red, green, blue):
     x = -(b0 + (b1 * red) + (b2 * green) + (b3 * blue))
     odds = exp(x)
-    p = ?
+    p = 1 / (1+odds)
     return p
 
 
 for i in range(iterations):
-
     # Select b0, b1, b2, or b3 randomly, and adjust it by a random amount
     random_b = random.choice(range(4))
-
     random_adjust = np.random.standard_normal()
 
     if random_b == 0:
@@ -71,15 +68,17 @@ for i in range(iterations):
     new_likelihood = 0.0
 
     for c in training_colors:
-
         probability = predict_probability(c.red, c.green, c.blue)
 
-        if c.dark_font_ind == 1:
+        if c.dark_font_ind == 1: 
             new_likelihood += log(probability)
         else:
-            new_likelihood += log(? - probability)
+            new_likelihood += log(1 - probability) # complement of dark font (0) to treat light fonts as "true"
 
     # If solution improves, keep it and make it new best likelihood. Otherwise undo the adjustment
+
+    #new_likelihood = exp(new_likelihood) #raise sum of ln's to e to get the product of probabilities without floating point underflow
+
     if best_likelihood < new_likelihood:
         best_likelihood = new_likelihood
     elif random_b == 0:
@@ -106,5 +105,8 @@ def predict_font_shade(r, g, b):
 
 while True:
     n = input("Predict light or dark font. Input values R,G,B: ")
-    (r, g, b) = n.split(",")
-    print(predict_font_shade(int(r) / 255.0 , int(g) / 255.0, int(b) / 255.0))
+    if (n == "exit"):
+        break
+    else:  
+        (r, g, b) = n.split(",")
+        print(predict_font_shade(int(r) / 255.0 , int(g) / 255.0, int(b) / 255.0))
